@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+    app_www:
+        build: .
+        image: app_www
+        expose: 
+            - "80"
+        volumes:
+            - ./www:/var/www/html/
+        links:
+            - db
+        networks:
+            - afif-net
+    app:
+        build: .
+        image: app
+        expose:
+            - "80"
+        volumes:
+            - ./www2:/var/www/html/
+        links:
+            - db
+        networks:
+            - afif-net
+    db:
+        image: mysql:8.0
+        expose: 
+            - "3306"
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: demo
+            MYSQL_USER: user
+            MYSQL_PASSWORD: test
+            MYSQL_ROOT_PASSWORD: test 
+        volumes:
+            - ./db:/docker-entrypoint-initdb.d
+            - ./conf:/etc/mysql/conf.d
+            - persistent:/var/lib/mysql
+        networks:
+            - afif-net
+
+volumes:
+    persistent:
+networks:
+    afif-net:
+       driver: overlay
+       attachable: true
